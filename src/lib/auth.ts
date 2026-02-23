@@ -1,11 +1,7 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { prisma } from "./prisma";
 
-// ─── USER AUTH ────────────────────────────────────────────────────────────────
-// Uses cookie: "user-session"
-// Served at: /api/auth/user/[...nextauth]
 export const userAuthOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
@@ -31,6 +27,7 @@ export const userAuthOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+        const { prisma } = await import("./prisma");
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
@@ -67,9 +64,6 @@ export const userAuthOptions: NextAuthOptions = {
   },
 };
 
-// ─── ADMIN AUTH ───────────────────────────────────────────────────────────────
-// Uses cookie: "admin-session"
-// Served at: /api/auth/admin/[...nextauth]
 export const adminAuthOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
@@ -95,6 +89,7 @@ export const adminAuthOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
+        const { prisma } = await import("./prisma");
         const admin = await prisma.admin.findUnique({
           where: { email: credentials.email },
         });
@@ -131,5 +126,4 @@ export const adminAuthOptions: NextAuthOptions = {
   },
 };
 
-// backwards-compat — existing imports of authOptions still work
 export const authOptions = userAuthOptions;
