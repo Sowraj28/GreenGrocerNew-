@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { adminAuthOptions } from "@/lib/auth";
 
@@ -11,6 +11,8 @@ export async function GET(req: NextRequest) {
     if (!session || (session.user as any).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { prisma } = await import("@/lib/prisma");
 
     const customers = await prisma.user.findMany({
       include: {
