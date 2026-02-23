@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    serverComponentsExternalPackages: ["@prisma/client", "bcryptjs"],
+  },
   images: {
     domains: [
-      'res.cloudinary.com',
-      'images.unsplash.com',
-      'via.placeholder.com',
+      "res.cloudinary.com",
+      "images.unsplash.com",
+      "via.placeholder.com",
     ],
   },
 };
