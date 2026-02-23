@@ -7,6 +7,8 @@ import { FiMail, FiLock, FiUser, FiPhone, FiMapPin, FiEye, FiEyeOff } from 'reac
 import { GiWheat } from 'react-icons/gi';
 import toast from 'react-hot-toast';
 
+export const dynamic = "force-dynamic";
+
 export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', password: '', confirm: '' });

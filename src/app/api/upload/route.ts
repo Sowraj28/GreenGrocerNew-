@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { adminAuthOptions } from "@/lib/auth";
 import { uploadImage } from "@/lib/cloudinary";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(adminAuthOptions);
