@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  password  String
+  address   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+  cartItems CartItem[]
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  description String?
+  imageUrl    String?
+  cloudinaryId String?
+  categoryId  String?
+  category    Category?     @relation(fields: [categoryId], references: [id])
+  variants    ProductVariant[]
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  weight    String   // e.g. "500g", "1kg", "2kg"
+  price     Float
+  stock     Int      @default(0)
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  variantId String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
+  items         OrderItem[]
+  totalAmount   Float
+  status        OrderStatus @default(PLACED)
+  address       String
+  phone         String
+  paymentStatus String      @default("PAID")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  variantId String
+  weight    String
+  name      String
+  quantity  Int
+  price     Float
+  checked   Boolean @default(false)
+}
+
+enum OrderStatus {
+  PLACED
+  PACKING
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+}
