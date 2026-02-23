@@ -13,8 +13,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { prisma } = await import("@/lib/prisma");
-
     const [totalProducts, totalOrders, totalCustomers, orders] =
       await Promise.all([
         prisma.product.count({ where: { isActive: true } }),
