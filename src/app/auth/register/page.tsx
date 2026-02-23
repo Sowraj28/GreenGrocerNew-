@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = "force-dynamic";
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -7,7 +8,7 @@ import { FiMail, FiLock, FiUser, FiPhone, FiMapPin, FiEye, FiEyeOff } from 'reac
 import { GiWheat } from 'react-icons/gi';
 import toast from 'react-hot-toast';
 
-export const dynamic = "force-dynamic";
+
 
 export default function RegisterPage() {
   const router = useRouter();
