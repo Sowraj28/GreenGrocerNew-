@@ -1,11 +1,11 @@
 export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { adminAuthOptions } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   try {
+    const { prisma } = await import("@/lib/prisma");
     const { searchParams } = new URL(req.url);
     const category = searchParams.get("category");
     const search = searchParams.get("search");

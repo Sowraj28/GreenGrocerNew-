@@ -7,6 +7,7 @@ import { uploadImage } from "@/lib/cloudinary";
 
 export async function POST(req: NextRequest) {
   try {
+    const { prisma } = await import("@/lib/prisma");
     const session = await getServerSession(adminAuthOptions);
     if (!session || (session.user as any).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

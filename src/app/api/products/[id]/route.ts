@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { adminAuthOptions } from "@/lib/auth";
 
@@ -10,6 +9,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
+    const { prisma } = await import("@/lib/prisma");
     const product = await prisma.product.findUnique({
       where: { id: params.id },
       include: { variants: true, category: true },

@@ -1,7 +1,6 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { userAuthOptions, adminAuthOptions } from "@/lib/auth";
 
@@ -12,6 +11,7 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
+    const { prisma } = await import("@/lib/prisma");
     const adminSession = await getServerSession(adminAuthOptions);
     const userSession = await getServerSession(userAuthOptions);
     if (!adminSession && !userSession)
