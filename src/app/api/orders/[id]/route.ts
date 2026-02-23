@@ -1,96 +1,82 @@
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { userAuthOptions, adminAuthOptions } from "@/lib/auth";
 
-  
-
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function POST(req: NextRequest) {
   try {
     const { prisma } = await import("@/lib/prisma");
-    const adminSession = await getServerSession(adminAuthOptions);
-    const userSession = await getServerSession(userAuthOptions);
-    if (!adminSession && !userSession)
+    const session = await getServerSession(userAuthOptions);
+    if (!session)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const order = await prisma.order.findUnique({
-      where: { id: params.id },
+    const userId = (session.user as any).id;
+    const { items, totalAmount, address, phone } = await req.json();
+
+    for (const item of items) {
+      await prisma.productVariant.updateMany({
+        where: { id: item.variantId },
+        data: { stock: { decrement: item.quantity } },
+      });
+    }
+
+    await prisma.cartItem.deleteMany({ where: { userId } });
+
+    const order = await prisma.order.create({
+      data: {
+        userId,
+        totalAmount,
+        address,
+        phone,
+        items: {
+          create: items.map((item: any) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            weight: item.weight,
+            name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+        },
+      },
       include: { items: { include: { product: true } }, user: true },
     });
-    if (!order)
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json(order);
-  } catch {
+
+    return NextResponse.json(order, { status: 201 });
+  } catch (error) {
+    console.error(error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req: NextRequest) {
   try {
-    const body = await req.json();
+    const { prisma } = await import("@/lib/prisma");
 
-    // Admin actions — status change or item checkbox
     const adminSession = await getServerSession(adminAuthOptions);
     if (adminSession && (adminSession.user as any).role === "admin") {
-      if (body.status) {
-        const order = await prisma.order.update({
-          where: { id: params.id },
-          data: { status: body.status },
-          include: { items: { include: { product: true } }, user: true },
-        });
-        return NextResponse.json(order);
-      }
-
-      if (body.itemId !== undefined && body.checked !== undefined) {
-        const item = await prisma.orderItem.update({
-          where: { id: body.itemId },
-          data: { checked: body.checked },
-        });
-        return NextResponse.json(item);
-      }
-    }
-
-    // User actions — cancel order
-    const userSession = await getServerSession(userAuthOptions);
-    if (userSession && body.cancel) {
-      const userId = (userSession.user as any).id;
-      const order = await prisma.order.findUnique({ where: { id: params.id } });
-      if (!order || order.userId !== userId)
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-      if (order.status !== "PLACED")
-        return NextResponse.json({ error: "Cannot cancel" }, { status: 400 });
-
-      const items = await prisma.orderItem.findMany({
-        where: { orderId: params.id },
-      });
-      for (const item of items) {
-        await prisma.productVariant.updateMany({
-          where: { id: item.variantId },
-          data: { stock: { increment: item.quantity } },
-        });
-      }
-
-      const updated = await prisma.order.update({
-        where: { id: params.id },
-        data: { status: "CANCELLED" },
+      const orders = await prisma.order.findMany({
         include: { items: { include: { product: true } }, user: true },
+        orderBy: { createdAt: "desc" },
       });
-      return NextResponse.json(updated);
+      return NextResponse.json(orders);
     }
 
-    return NextResponse.json(
-      { error: "Unauthorized or invalid request" },
-      { status: 401 },
-    );
-  } catch (error) {
-    console.error(error);
+    const userSession = await getServerSession(userAuthOptions);
+    if (userSession) {
+      const userId = (userSession.user as any).id;
+      const orders = await prisma.order.findMany({
+        where: { userId },
+        include: { items: { include: { product: true } } },
+        orderBy: { createdAt: "desc" },
+      });
+      return NextResponse.json(orders);
+    }
+
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

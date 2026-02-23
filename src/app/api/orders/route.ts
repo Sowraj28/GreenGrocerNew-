@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -52,7 +53,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
-    // Check admin session first
+    const { prisma } = await import("@/lib/prisma");
+
     const adminSession = await getServerSession(adminAuthOptions);
     if (adminSession && (adminSession.user as any).role === "admin") {
       const orders = await prisma.order.findMany({
@@ -62,7 +64,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(orders);
     }
 
-    // Then check user session
     const userSession = await getServerSession(userAuthOptions);
     if (userSession) {
       const userId = (userSession.user as any).id;

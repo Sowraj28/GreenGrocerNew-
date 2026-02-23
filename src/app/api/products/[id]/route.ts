@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
@@ -27,20 +28,13 @@ export async function PUT(
   { params }: { params: { id: string } },
 ) {
   try {
+    const { prisma } = await import("@/lib/prisma");
     const session = await getServerSession(adminAuthOptions);
     if (!session || (session.user as any).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const body = await req.json();
-    const {
-      name,
-      description,
-      imageUrl,
-      cloudinaryId,
-      categoryId,
-      variants,
-      isActive,
-    } = body;
+    const { name, description, imageUrl, cloudinaryId, categoryId, variants, isActive } = body;
 
     await prisma.productVariant.deleteMany({ where: { productId: params.id } });
 
@@ -68,6 +62,7 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
+    const { prisma } = await import("@/lib/prisma");
     const session = await getServerSession(adminAuthOptions);
     if (!session || (session.user as any).role !== "admin") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
