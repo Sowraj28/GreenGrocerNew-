@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 import { NextResponse } from "next/server";
 
@@ -9,7 +10,8 @@ export async function GET() {
       orderBy: { name: "asc" },
     });
     return NextResponse.json(categories);
-  } catch {
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  } catch (error) {
+    console.error("Categories error:", error);
+    return NextResponse.json({ error: String(error) }, { status: 500 });
   }
 }
