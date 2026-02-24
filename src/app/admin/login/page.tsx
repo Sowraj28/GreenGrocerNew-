@@ -117,9 +117,10 @@ export default function AdminLoginPage() {
             </button>
           </form>
 
-          <div className="mt-5 p-3 bg-gray-50 rounded-xl text-xs text-gray-500">
-            <strong>Note:</strong> Admin credentials are separate from customer
-            accounts.
+          <div className="mt-5 p-3 bg-green-50 rounded-xl text-xs text-gray-600 border border-green-100">
+            <p className="font-bold text-gray-700 mb-1">Demo Credentials</p>
+            <p>📧 admin@greengrocer.com</p>
+            <p>🔑 admin123</p>
           </div>
         </div>
       </div>

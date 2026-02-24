@@ -35,9 +35,9 @@ export default function UserNavbar() {
             <Link href="/shop" className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-600 hover:text-brand-primary hover:bg-brand-50 font-medium transition-all">
               <FiHome size={16} /> Shop
             </Link>
-            <Link href="/cart" className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-600 hover:text-brand-primary hover:bg-brand-50 font-medium transition-all">
+            {/*<Link href="/cart" className="flex items-center gap-2 px-4 py-2 rounded-xl text-gray-600 hover:text-brand-primary hover:bg-brand-50 font-medium transition-all">
               <FiGrid size={16} /> Categories
-            </Link>
+            </Link>*/}
           </div>
 
           {/* Right side */}

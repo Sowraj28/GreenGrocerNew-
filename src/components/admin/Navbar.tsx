@@ -243,7 +243,11 @@ export default function AdminNavbar({
                 </p>
               </div>
               <button
-                onClick={() => signOut({ callbackUrl: "/admin/login" })}
+                onClick={() =>
+                  signOut({
+                    callbackUrl: `${window.location.origin}/admin/login`,
+                  })
+                }
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-gray-600 hover:text-red-600 transition-colors text-sm"
               >
                 <FiLogOut size={16} /> Sign Out

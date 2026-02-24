@@ -7,7 +7,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   const isAdmin = pathname?.startsWith("/admin");
 
   return (
-    <SessionProvider basePath={isAdmin ? "/api/auth/admin" : "/api/auth/user"}>
+    <SessionProvider
+      basePath={isAdmin ? "/api/auth/admin" : "/api/auth/user"}
+      refetchOnWindowFocus={false}
+    >
       {children}
     </SessionProvider>
   );
